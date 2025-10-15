@@ -1,4 +1,5 @@
 import MyDialog from '@/components/dialog';
+import Navbar from '@/components/navbar';
 import MapArea from '@/features/map';
 import { getMaps } from '@/lib/getMapData';
 
@@ -8,7 +9,7 @@ export default async function Home() {
   return (
     <div className="">
       <main className="flex flex-col">
-        <MyDialog />
+        <Navbar />
         <MapArea locations={maps} />
       </main>
     </div>
