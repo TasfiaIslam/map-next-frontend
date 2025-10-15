@@ -1,14 +1,15 @@
-import MyDialog from "@/components/common/dialog";
-import OLMap from "@/components/map";
-import Image from "next/image";
+import MyDialog from '@/components/dialog';
+import MapArea from '@/features/map';
+import { getMaps } from '@/lib/getMapData';
 
-export default function Home() {
+export default async function Home() {
+  const maps = await getMaps();
+  console.log({ maps });
   return (
-    <div className="font-sans grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20">
-      <main className="flex flex-col gap-[32px] row-start-2 items-center sm:items-start">
-        <h1 className="text-3xl text-green-600">New Next Project</h1>
+    <div className="">
+      <main className="flex flex-col">
         <MyDialog />
-        <OLMap />
+        <MapArea locations={maps} />
       </main>
     </div>
   );
