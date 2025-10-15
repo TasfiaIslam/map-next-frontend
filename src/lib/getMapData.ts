@@ -10,7 +10,8 @@ export async function getMaps() {
       municipalityName,
       boroughName,
       subareaName,
-      postalCode
+      postalCode,
+      marketStates
     }
   `);
 }

@@ -11,7 +11,7 @@ import VectorLayer from 'ol/layer/Vector';
 import VectorSource from 'ol/source/Vector';
 import { fromLonLat } from 'ol/proj';
 import { Icon, Style } from 'ol/style';
-import { MapProps } from './types';
+import { MapProps, MARKET_STATES } from './types';
 
 const MapArea = ({ locations }: MapProps) => {
   const mapRef = useRef<HTMLDivElement>(null);
@@ -19,7 +19,15 @@ const MapArea = ({ locations }: MapProps) => {
   useEffect(() => {
     if (!mapRef.current) return;
 
-    const features = locations.map((loc) => {
+    const features = locations.map((loc, index) => {
+      console.log('loc---->', locations);
+      let iconSrc = '/images/pending-marker.svg';
+      if (loc.marketStates[0] === MARKET_STATES.SOLD) {
+        iconSrc = '/images/sold-marker.svg';
+      } else if (loc.marketStates[0] === MARKET_STATES.PENDING) {
+        iconSrc = '/images/sold-marker.svg';
+      }
+
       const feature = new Feature({
         geometry: new Point(fromLonLat([loc.coordinatesLng, loc.coordinatesLat])),
         name: loc.name,
@@ -27,8 +35,8 @@ const MapArea = ({ locations }: MapProps) => {
       feature.setStyle(
         new Style({
           image: new Icon({
-            src: '/marker.png',
-            scale: 0.05,
+            src: iconSrc,
+            scale: 0.3,
           }),
         }),
       );
@@ -50,7 +58,7 @@ const MapArea = ({ locations }: MapProps) => {
         vectorLayer,
       ],
       view: new View({
-        center: fromLonLat([locations[0]?.coordinatesLng || 0, locations[0]?.coordinatesLat || 0]),
+        center: fromLonLat([locations[6]?.coordinatesLng || 0, locations[6]?.coordinatesLat || 0]),
         zoom: 12,
       }),
     });
