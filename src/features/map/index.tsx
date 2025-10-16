@@ -1,72 +1,81 @@
 'use client';
 
-import { useEffect, useRef } from 'react';
-import OlMap from 'ol/Map';
-import View from 'ol/View';
-import TileLayer from 'ol/layer/Tile';
-import OSM from 'ol/source/OSM';
-import Feature from 'ol/Feature';
-import Point from 'ol/geom/Point';
-import VectorLayer from 'ol/layer/Vector';
-import VectorSource from 'ol/source/Vector';
-import { fromLonLat } from 'ol/proj';
-import { Icon, Style } from 'ol/style';
-import { MapProps, MARKET_STATES } from './types';
+import React, { useEffect, useMemo, useState } from 'react';
+import debounce from 'lodash/debounce';
+import Navbar from '@/components/navbar';
+import MapArea from './map-area';
+import { getMaps } from '@/lib/getMapData';
+import MapPopover from '@/components/pop-over';
+import { MapLocation } from './types';
 
-const MapArea = ({ locations }: MapProps) => {
-  const mapRef = useRef<HTMLDivElement>(null);
+const MapWithSearchFilter = () => {
+  const [open, setOpen] = useState(false);
+  const [maps, setMaps] = useState<MapLocation[]>([]);
+  const [query, setQuery] = useState('');
+  const [selectedLocation, setSelectedLocation] = useState<string | undefined>();
 
   useEffect(() => {
-    if (!mapRef.current) return;
-
-    const features = locations.map((loc, index) => {
-      console.log('loc---->', locations);
-      let iconSrc = '/images/pending-marker.svg';
-      if (loc.marketStates[0] === MARKET_STATES.SOLD) {
-        iconSrc = '/images/sold-marker.svg';
-      } else if (loc.marketStates[0] === MARKET_STATES.PENDING) {
-        iconSrc = '/images/sold-marker.svg';
-      }
-
-      const feature = new Feature({
-        geometry: new Point(fromLonLat([loc.coordinatesLng, loc.coordinatesLat])),
-        name: loc.name,
-      });
-      feature.setStyle(
-        new Style({
-          image: new Icon({
-            src: iconSrc,
-            scale: 0.3,
-          }),
-        }),
+    async function fetchMaps() {
+      const res = await fetch('/api/maps');
+      const data = await res.json();
+      console.log({ data });
+      setMaps(
+        data.map((item: any) => ({
+          streetId: item.streetId,
+          streetName: item.streetName,
+          streetNumber: item.streetNumber,
+          coordinatesLat: item.coordinatesLat,
+          coordinatesLng: item.coordinatesLng,
+          municipalityName: item.municipalityName,
+          boroughName: item.boroughName,
+          subareaName: item.subareaName,
+          postalCode: item.postalCode,
+          marketStates: item.marketStates,
+        })),
       );
-      return feature;
+    }
+
+    fetchMaps();
+  }, []);
+
+  const handleSearchChange = useMemo(
+    () =>
+      debounce((q: string) => {
+        setQuery(q);
+        setOpen(q.length > 0);
+      }, 300),
+    [],
+  );
+
+  const filteredLocations = useMemo(() => {
+    const lower = query.toLowerCase();
+    return maps.filter((loc) => {
+      return loc.streetName && loc.streetName.toLowerCase().includes(lower);
     });
+  }, [query, maps]);
 
-    const vectorLayer = new VectorLayer({
-      source: new VectorSource({
-        features,
-      }),
-    });
+  const handleSelect = (locId: string) => {
+    setSelectedLocation(locId);
+    setQuery('');
+  };
 
-    const map = new OlMap({
-      target: mapRef.current,
-      layers: [
-        new TileLayer({
-          source: new OSM(),
-        }),
-        vectorLayer,
-      ],
-      view: new View({
-        center: fromLonLat([locations[6]?.coordinatesLng || 0, locations[6]?.coordinatesLat || 0]),
-        zoom: 12,
-      }),
-    });
-
-    return () => map.setTarget(undefined);
-  }, [locations]);
-
-  return <div ref={mapRef} className="w-full h-screen" />;
+  return (
+    <div className="relative">
+      <Navbar query={query} setQuery={handleSearchChange} />
+      <MapArea locations={maps} selectedLocationId={selectedLocation} />
+      {query && (
+        <div className="absolute top-20 left-4 z-50 pointer-events-auto">
+          <MapPopover
+            query={query}
+            locations={filteredLocations}
+            open={open}
+            onOpenChange={setOpen}
+            // onSelect={(loc) => handleSelect(loc.streetId)}
+          />
+        </div>
+      )}
+    </div>
+  );
 };
 
-export default MapArea;
+export default MapWithSearchFilter;

@@ -2,14 +2,15 @@
 import React from 'react';
 import Search from './search';
 
-const Navbar = () => {
+interface NavbarProps {
+  query?: string;
+  setQuery: (q: string) => void;
+}
+
+const Navbar = ({ query, setQuery }: NavbarProps) => {
   return (
     <div className="bg-white px-3 py-2 flex">
-      <Search
-        onSearch={function (query: string): void {
-          throw new Error('Function not implemented.');
-        }}
-      />
+      <Search query={query} setQuery={setQuery} />
     </div>
   );
 };

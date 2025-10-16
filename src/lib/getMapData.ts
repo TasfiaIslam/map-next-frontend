@@ -11,6 +11,14 @@ export async function getMaps() {
       boroughName,
       subareaName,
       postalCode,
+      streetName,
+      streetNumber,
+      streetLetter,
+      slug,
+      unitType,
+      hasLiveSales,
+      isLiveSalesApproved,
+      adStates,
       marketStates
     }
   `);
