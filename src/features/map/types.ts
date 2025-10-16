@@ -26,5 +26,6 @@ export interface MapLocation {
 
 export interface MapProps {
   locations: MapLocation[];
-  selectedLocationId?: string;
+  selectedLocation?: MapLocation;
+  onMarkerClick: (location: MapLocation) => void;
 }

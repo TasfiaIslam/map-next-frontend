@@ -4,7 +4,6 @@ import React, { useEffect, useMemo, useState } from 'react';
 import debounce from 'lodash/debounce';
 import Navbar from '@/components/navbar';
 import MapArea from './map-area';
-import { getMaps } from '@/lib/getMapData';
 import MapPopover from '@/components/pop-over';
 import { MapLocation } from './types';
 
@@ -12,7 +11,7 @@ const MapWithSearchFilter = () => {
   const [open, setOpen] = useState(false);
   const [maps, setMaps] = useState<MapLocation[]>([]);
   const [query, setQuery] = useState('');
-  const [selectedLocation, setSelectedLocation] = useState<string | undefined>();
+  const [selectedLocation, setSelectedLocation] = useState<MapLocation | undefined>();
 
   useEffect(() => {
     async function fetchMaps() {
@@ -54,26 +53,35 @@ const MapWithSearchFilter = () => {
     });
   }, [query, maps]);
 
-  const handleSelect = (locId: string) => {
-    setSelectedLocation(locId);
-    setQuery('');
+  const handleMarkerClick = (loc: MapLocation) => {
+    console.log({ loc });
+    setSelectedLocation(loc);
+    setOpen(true);
   };
 
   return (
-    <div className="relative">
+    <div className="">
       <Navbar query={query} setQuery={handleSearchChange} />
-      <MapArea locations={maps} selectedLocationId={selectedLocation} />
-      {query && (
-        <div className="absolute top-20 left-4 z-50 pointer-events-auto">
-          <MapPopover
-            query={query}
-            locations={filteredLocations}
-            open={open}
-            onOpenChange={setOpen}
-            // onSelect={(loc) => handleSelect(loc.streetId)}
-          />
-        </div>
-      )}
+      <MapArea
+        locations={maps}
+        selectedLocation={selectedLocation}
+        onMarkerClick={handleMarkerClick}
+      />
+      <div className="">
+        <MapPopover
+          query={query}
+          locations={filteredLocations}
+          open={open}
+          onOpenChange={(isOpen) => {
+            setOpen(isOpen);
+            if (!isOpen) {
+              setSelectedLocation(undefined);
+              setQuery('');
+            }
+          }}
+          selectedLocation={selectedLocation}
+        />
+      </div>
     </div>
   );
 };

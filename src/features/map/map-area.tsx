@@ -11,16 +11,17 @@ import VectorLayer from 'ol/layer/Vector';
 import VectorSource from 'ol/source/Vector';
 import { fromLonLat } from 'ol/proj';
 import { Icon, Style } from 'ol/style';
-import { MapProps, MARKET_STATES } from './types';
+import { MapLocation, MapProps, MARKET_STATES } from './types';
+import { Overlay } from 'ol';
 
-const MapArea = ({ locations }: MapProps) => {
+const MapArea = ({ locations, onMarkerClick }: MapProps) => {
   const mapRef = useRef<HTMLDivElement>(null);
+  const popupRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
     if (!mapRef.current) return;
 
     const features = locations.map((loc, index) => {
-      // console.log('loc---->', locations);
       let iconSrc = '/images/pending-marker.svg';
       if (loc.marketStates[0] === MARKET_STATES.SOLD) {
         iconSrc = '/images/sold-marker.svg';
@@ -31,6 +32,7 @@ const MapArea = ({ locations }: MapProps) => {
       const feature = new Feature({
         geometry: new Point(fromLonLat([loc.coordinatesLng, loc.coordinatesLat])),
         name: loc.streetName,
+        data: loc,
       });
       feature.setStyle(
         new Style({
@@ -49,6 +51,11 @@ const MapArea = ({ locations }: MapProps) => {
       }),
     });
 
+    const overlay = new Overlay({
+      element: popupRef.current!,
+      autoPan: { animation: { duration: 250 } },
+    });
+
     const map = new OlMap({
       target: mapRef.current,
       layers: [
@@ -57,16 +64,34 @@ const MapArea = ({ locations }: MapProps) => {
         }),
         vectorLayer,
       ],
+      overlays: [overlay],
       view: new View({
         center: fromLonLat([locations[6]?.coordinatesLng || 0, locations[6]?.coordinatesLat || 0]),
         zoom: 12,
       }),
     });
 
+    map.on('singleclick', (evt) => {
+      const feature = map.forEachFeatureAtPixel(evt.pixel, (f) => f) as Feature | undefined;
+      if (feature) {
+        const data = feature.get('data') as MapLocation;
+        onMarkerClick(data);
+      }
+    });
+
     return () => map.setTarget(undefined);
   }, [locations]);
 
-  return <div ref={mapRef} className="w-full h-screen" />;
+  return (
+    <div className="relative">
+      <div ref={mapRef} className="w-full h-screen" />
+      <div
+        ref={popupRef}
+        className="absolute bg-white rounded-lg shadow-lg border border-gray-300"
+        style={{ minWidth: 200 }}
+      ></div>
+    </div>
+  );
 };
 
 export default MapArea;
