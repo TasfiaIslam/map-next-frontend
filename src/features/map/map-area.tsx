@@ -20,15 +20,31 @@ const MapArea = ({ appliedFilters, locations, onMarkerClick }: MapProps) => {
 
   console.log({ appliedFilters });
 
+  function getIcon(marketState: string) {
+    // if (loc.marketStates[0] === MARKET_STATES.SOLD) {
+    //   iconSrc = '/images/sold-marker.svg';
+    // } else if (loc.marketStates[0] === MARKET_STATES.PENDING) {
+    //   iconSrc = '/images/pending-marker.svg';
+    // }
+    let iconSrc = '/images/pending-marker.svg';
+    if (marketState === MARKET_STATES.SOLD) {
+      iconSrc = '/images/sold-marker.svg';
+    } else if (marketState === MARKET_STATES.PENDING) {
+      iconSrc = '/images/pending-marker.svg';
+    }
+
+    return iconSrc;
+  }
+
   useEffect(() => {
     if (!mapRef.current) return;
 
     const features = locations.map((loc, index) => {
       let iconSrc = '/images/pending-marker.svg';
-      if (loc.marketStates[0] === MARKET_STATES.SOLD) {
-        iconSrc = '/images/sold-marker.svg';
-      } else if (loc.marketStates[0] === MARKET_STATES.PENDING) {
-        iconSrc = '/images/pending-marker.svg';
+      if (appliedFilters?.marketStates && appliedFilters?.marketStates?.length === 1) {
+        iconSrc = getIcon(appliedFilters?.marketStates[0]);
+      } else {
+        iconSrc = getIcon(loc.marketStates[0]);
       }
 
       const feature = new Feature({

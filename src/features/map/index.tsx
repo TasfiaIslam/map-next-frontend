@@ -91,7 +91,7 @@ const MapWithSearchFilter = () => {
       />
       <div
         onClick={(e) => setOpenFilterPopup(true)}
-        className="bg-white absolute right-4 top-16 z-30 rounded-md px-4 py-1 text-gray-600 text-sm"
+        className="bg-white absolute right-4 top-16 z-30 rounded-md px-4 py-1 text-gray-600 text-sm cursor-pointer"
       >
         Filter
       </div>
