@@ -26,7 +26,7 @@ const MapPopover = ({ query, locations, selectedLocation, open, onOpenChange }: 
         side="top"
         align="start"
         sideOffset={8}
-        className="absolute top-4 right-4 w-64 bg-white text-gray-800 border rounded-xl shadow-lg p-2 z-50"
+        className="absolute top-4 left-4 w-64 bg-white text-gray-800 border rounded-xl shadow-lg p-2 z-50"
       >
         {selectedLocation ? (
           <div className="max-h-60 overflow-y-auto">

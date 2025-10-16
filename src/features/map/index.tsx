@@ -56,13 +56,13 @@ const MapWithSearchFilter = () => {
   const filteredLocations = useMemo(() => {
     const lower = query.toLowerCase();
     return maps.filter((loc) => {
-      if (filters.marketStates && filters.marketStates.length) {
-        console.log(filters, loc.marketStates);
-        return filters.marketStates.includes(loc.marketStates.toString());
-      }
+      // if (filters.marketStates && filters.marketStates.length) {
+      //   console.log(filters, loc.marketStates);
+      //   return filters.marketStates.includes(loc.marketStates.toString());
+      // }
       return loc.streetName && loc.streetName.toLowerCase().includes(lower);
     });
-  }, [query, maps, filters]);
+  }, [query, maps]);
 
   console.log({ filteredLocations });
 
@@ -78,6 +78,8 @@ const MapWithSearchFilter = () => {
     setOpen(true);
   };
 
+  console.log({ selectedLocation });
+
   return (
     <div className="relative">
       <Navbar query={query} setQuery={handleSearchChange} />
@@ -89,12 +91,12 @@ const MapWithSearchFilter = () => {
           marketStates: filters?.marketStates ? [filters?.marketStates] : [],
         }}
       />
-      <div
+      {/* <div
         onClick={(e) => setOpenFilterPopup(true)}
         className="bg-white absolute right-4 top-16 z-30 rounded-md px-4 py-1 text-gray-600 text-sm cursor-pointer"
       >
         Filter
-      </div>
+      </div> */}
       <MapPopover
         query={query}
         locations={filteredLocations}
@@ -108,7 +110,7 @@ const MapWithSearchFilter = () => {
         }}
         selectedLocation={selectedLocation}
       />
-      <div className="absolute top-4 right-4 z-20">
+      {/* <div className="absolute top-4 right-4 z-20">
         <FilterPopup
           open={openFilterPopup}
           filters={filters}
@@ -120,7 +122,7 @@ const MapWithSearchFilter = () => {
             // }
           }}
         />
-      </div>
+      </div> */}
     </div>
   );
 };

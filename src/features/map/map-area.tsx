@@ -41,18 +41,23 @@ const MapArea = ({ appliedFilters, locations, onMarkerClick }: MapProps) => {
 
     const features = locations.map((loc, index) => {
       let iconSrc = '/images/pending-marker.svg';
-      if (appliedFilters?.marketStates && appliedFilters?.marketStates?.length === 1) {
-        iconSrc = getIcon(appliedFilters?.marketStates[0]);
-      } else {
-        iconSrc = getIcon(loc.marketStates[0]);
+      // if (appliedFilters?.marketStates && appliedFilters?.marketStates?.length === 1) {
+      //   iconSrc = getIcon(appliedFilters?.marketStates[0]);
+      // } else {
+      //   iconSrc = getIcon(loc.marketStates[0]);
+      // }
+
+      if (loc.marketStates[0] === MARKET_STATES.SOLD) {
+        iconSrc = '/images/sold-marker.svg';
+      } else if (loc.marketStates[0] === MARKET_STATES.PENDING) {
+        iconSrc = '/images/pending-marker.svg';
       }
 
       const feature = new Feature({
         geometry: new Point(fromLonLat([loc.coordinatesLng, loc.coordinatesLat])),
         name: loc.streetName,
-        marketState: appliedFilters?.marketStates ?? loc.marketStates,
+        data: loc,
       });
-
       feature.setStyle(
         new Style({
           image: new Icon({
@@ -61,6 +66,22 @@ const MapArea = ({ appliedFilters, locations, onMarkerClick }: MapProps) => {
           }),
         }),
       );
+
+      // const feature = new Feature({
+      //   geometry: new Point(fromLonLat([loc.coordinatesLng, loc.coordinatesLat])),
+      //   name: loc.streetName,
+      //   // marketState: appliedFilters?.marketStates ?? loc.marketStates,
+      //   marketState: loc.marketStates,
+      // });
+
+      // feature.setStyle(
+      //   new Style({
+      //     image: new Icon({
+      //       src: iconSrc,
+      //       scale: 0.3,
+      //     }),
+      //   }),
+      // );
       return feature;
     });
 
@@ -99,7 +120,7 @@ const MapArea = ({ appliedFilters, locations, onMarkerClick }: MapProps) => {
     });
 
     return () => map.setTarget(undefined);
-  }, [locations, appliedFilters]);
+  }, [locations]);
 
   return (
     <div className="relative">
