@@ -27,5 +27,8 @@ export interface MapLocation {
 export interface MapProps {
   locations: MapLocation[];
   selectedLocation?: MapLocation;
+  appliedFilters?: {
+    marketStates: string[]; // array of selected states from filter popup
+  };
   onMarkerClick: (location: MapLocation) => void;
 }

@@ -14,9 +14,11 @@ import { Icon, Style } from 'ol/style';
 import { MapLocation, MapProps, MARKET_STATES } from './types';
 import { Overlay } from 'ol';
 
-const MapArea = ({ locations, onMarkerClick }: MapProps) => {
+const MapArea = ({ appliedFilters, locations, onMarkerClick }: MapProps) => {
   const mapRef = useRef<HTMLDivElement>(null);
   const popupRef = useRef<HTMLDivElement | null>(null);
+
+  console.log({ appliedFilters });
 
   useEffect(() => {
     if (!mapRef.current) return;
@@ -26,14 +28,15 @@ const MapArea = ({ locations, onMarkerClick }: MapProps) => {
       if (loc.marketStates[0] === MARKET_STATES.SOLD) {
         iconSrc = '/images/sold-marker.svg';
       } else if (loc.marketStates[0] === MARKET_STATES.PENDING) {
-        iconSrc = '/images/sold-marker.svg';
+        iconSrc = '/images/pending-marker.svg';
       }
 
       const feature = new Feature({
         geometry: new Point(fromLonLat([loc.coordinatesLng, loc.coordinatesLat])),
         name: loc.streetName,
-        data: loc,
+        marketState: appliedFilters?.marketStates ?? loc.marketStates,
       });
+
       feature.setStyle(
         new Style({
           image: new Icon({
@@ -80,7 +83,7 @@ const MapArea = ({ locations, onMarkerClick }: MapProps) => {
     });
 
     return () => map.setTarget(undefined);
-  }, [locations]);
+  }, [locations, appliedFilters]);
 
   return (
     <div className="relative">

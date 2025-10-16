@@ -6,12 +6,19 @@ import Navbar from '@/components/navbar';
 import MapArea from './map-area';
 import MapPopover from '@/components/pop-over';
 import { MapLocation } from './types';
+import FilterPopup from '@/components/filter';
 
 const MapWithSearchFilter = () => {
   const [open, setOpen] = useState(false);
+  const [openFilterPopup, setOpenFilterPopup] = useState(false);
   const [maps, setMaps] = useState<MapLocation[]>([]);
   const [query, setQuery] = useState('');
   const [selectedLocation, setSelectedLocation] = useState<MapLocation | undefined>();
+
+  const [filters, setFilters] = useState<{
+    marketStates?: string;
+    unitType?: string;
+  }>({});
 
   useEffect(() => {
     async function fetchMaps() {
@@ -49,37 +56,69 @@ const MapWithSearchFilter = () => {
   const filteredLocations = useMemo(() => {
     const lower = query.toLowerCase();
     return maps.filter((loc) => {
+      if (filters.marketStates && filters.marketStates.length) {
+        console.log(filters, loc.marketStates);
+        return filters.marketStates.includes(loc.marketStates.toString());
+      }
       return loc.streetName && loc.streetName.toLowerCase().includes(lower);
     });
-  }, [query, maps]);
+  }, [query, maps, filters]);
+
+  console.log({ filteredLocations });
+
+  // const filteredLocations = useMemo(() => {
+  //   return maps.filter((loc) => {
+  //     if (!filters.marketStates || filters.marketStates.length === 0) return true;
+  //     return filters.marketStates.includes(loc.marketStates);
+  //   });
+  // }, [maps, filters]);
 
   const handleMarkerClick = (loc: MapLocation) => {
-    console.log({ loc });
     setSelectedLocation(loc);
     setOpen(true);
   };
 
   return (
-    <div className="">
+    <div className="relative">
       <Navbar query={query} setQuery={handleSearchChange} />
       <MapArea
         locations={maps}
         selectedLocation={selectedLocation}
         onMarkerClick={handleMarkerClick}
+        appliedFilters={{
+          marketStates: filters?.marketStates ? [filters?.marketStates] : [],
+        }}
       />
-      <div className="">
-        <MapPopover
-          query={query}
-          locations={filteredLocations}
-          open={open}
+      <div
+        onClick={(e) => setOpenFilterPopup(true)}
+        className="bg-white absolute right-4 top-16 z-30 rounded-md px-4 py-1 text-gray-600 text-sm"
+      >
+        Filter
+      </div>
+      <MapPopover
+        query={query}
+        locations={filteredLocations}
+        open={open}
+        onOpenChange={(isOpen) => {
+          setOpen(isOpen);
+          if (!isOpen) {
+            setSelectedLocation(undefined);
+            setQuery('');
+          }
+        }}
+        selectedLocation={selectedLocation}
+      />
+      <div className="absolute top-4 right-4 z-20">
+        <FilterPopup
+          open={openFilterPopup}
+          filters={filters}
+          setFilters={setFilters}
           onOpenChange={(isOpen) => {
-            setOpen(isOpen);
-            if (!isOpen) {
-              setSelectedLocation(undefined);
-              setQuery('');
-            }
+            setOpenFilterPopup(isOpen);
+            // if (!isOpen) {
+            //   setFilters({});
+            // }
           }}
-          selectedLocation={selectedLocation}
         />
       </div>
     </div>

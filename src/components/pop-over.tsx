@@ -1,8 +1,7 @@
 'use client';
 
 import * as Popover from '@radix-ui/react-popover';
-import { useMemo, useState } from 'react';
-import debounce from 'lodash/debounce';
+import { useMemo } from 'react';
 import { MapLocation } from '@/features/map/types';
 
 interface PropoverProps {

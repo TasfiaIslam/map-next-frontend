@@ -9,7 +9,7 @@ interface NavbarProps {
 
 const Navbar = ({ query, setQuery }: NavbarProps) => {
   return (
-    <div className="bg-white px-3 py-2 flex">
+    <div className="bg-white px-3 py-2 flex relative">
       <Search query={query} setQuery={setQuery} />
     </div>
   );
