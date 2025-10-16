@@ -78,8 +78,6 @@ const MapWithSearchFilter = () => {
     setOpen(true);
   };
 
-  console.log({ selectedLocation });
-
   return (
     <div className="relative">
       <Navbar query={query} setQuery={handleSearchChange} />
